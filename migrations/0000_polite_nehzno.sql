@@ -1,0 +1,3 @@
+CREATE TABLE `ad` (
+	`id` text PRIMARY KEY NOT NULL
+);
