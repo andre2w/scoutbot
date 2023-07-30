@@ -7,7 +7,9 @@
     "strict": true,                                      /* Enable all strict type-checking options. */ 
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "lib": ["DOM", "DOM.Iterable", "ES2020"],
-    "outDir": "build"
+    "outDir": "build",
+    "typeRoots": ["./node_modules"],
+    "types": ["@violentmonkey/types"]
   },
   "include": ["src"]
 }
