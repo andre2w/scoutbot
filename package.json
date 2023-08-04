@@ -4,10 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@types/markdown-escape": "^1.1.0",
     "@types/selenium-webdriver": "^4.1.15",
     "@violentmonkey/types": "^0.1.5",
     "better-sqlite3": "^8.5.0",
     "drizzle-orm": "^0.27.2",
+    "markdown-escape": "^2.0.0",
     "playwright": "^1.36.2",
     "selenium-webdriver": "^4.10.0",
     "telegraf": "^4.12.2"

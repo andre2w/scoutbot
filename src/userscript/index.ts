@@ -10,43 +10,30 @@
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
+import type { Listing } from "../types";
+
 const TWO_MINUTES = 1_000 * 60 * 2;
+const FIVE_MINUTES = 1_000 * 60 * 5;
 
 function getListings() {
     const listings = document.querySelectorAll(".result-list__listing");
-    const found: { id: string; link: string }[] = [];
+    const found: Listing[] = [];
     for (const listing of listings) {
         if (listing == null) continue;
         const listingLink = listing.querySelector("a.result-list-entry__brand-title-container");
         const listingId = listing.getAttribute("data-id")!;
-        found.push({ id: listingId, link: listingLink?.getAttribute("href")! })
+        const [price, size, rooms] = listing.querySelectorAll(".result-list-entry__criteria dl");
+        const address = listing.querySelector(".result-list-entry__address");
+        found.push({ 
+            id: listingId, 
+            link: listingLink?.getAttribute("href")!,
+            price: price!.textContent!,
+            size: size!.textContent!,
+            rooms: rooms!.textContent!,
+            address: address!.textContent!,
+        });
     }
     return found;
-}
-
-async function loop() {
-    while (true) {
-        const listings = getListings();    
-        await postToLocal(listings)
-        console.log("Will wait", TWO_MINUTES);
-        await delay(TWO_MINUTES);
-        console.log("Wait done");
-        location.reload();
-        console.log("Continuing after reload");
-    }
-}
-
-function startButton() {
-    const button = document.createElement("button");
-    button.innerText = "START";
-    button.id = "mybtn";
-    button.addEventListener("click", () => {
-        loop();
-    });
-    button.style.display = "absolute";
-    button.style.top = "0";
-    button.style.left = "0";
-    document.body.appendChild(button);
 }
 
 async function delay(time: number) {
@@ -71,4 +58,43 @@ async function postToLocal(data: any): Promise<VMScriptResponseObject<unknown>> 
     });
 }
 
-startButton();
+async function waitForSelector(selector: string, maxWaits = 10): Promise<void> {
+    let waitCount = 0;
+    while (waitCount < maxWaits) {
+        console.log("Waiting for selector", selector);
+        const nodes = document.querySelectorAll(selector);
+        if (nodes.length > 0) {
+            console.log("Selector found");
+            break;
+        } else {
+            console.log("Selector not found waiting one second");
+            await delay(1_000);
+        }
+        waitCount++;
+
+        if (waitCount >= maxWaits) {
+            throw new Error("Tried too many times");
+        }
+    }
+}
+
+async function start() {
+    console.log("Starting at", new Date().toISOString());
+    try {
+        await waitForSelector(".result-list__listing");
+        const listings = getListings();    
+        await postToLocal(listings);
+        console.log("Will wait", TWO_MINUTES);
+        await delay(FIVE_MINUTES);
+        console.log("Wait done");
+        location.reload();
+    } catch(error) {
+        await postToLocal({
+            "captcha": new Date(),
+        });
+        await delay(FIVE_MINUTES); 
+        location.reload();
+    }
+}
+
+start().catch(console.error);
