@@ -14,6 +14,7 @@ import type { Listing } from "../types";
 
 const TWO_MINUTES = 1_000 * 60 * 2;
 const FIVE_MINUTES = 1_000 * 60 * 5;
+const CAPTCHA_SELECTOR = "#captcha-box, .geetest_btn";
 
 function getListings() {
     const listings = document.querySelectorAll(".result-list__listing");
@@ -78,6 +79,11 @@ async function waitForSelector(selector: string, maxWaits = 10): Promise<void> {
     }
 }
 
+function isCaptchaPage() {
+    const captcha = document.querySelector(CAPTCHA_SELECTOR);
+    return !!captcha;
+}
+
 async function start() {
     console.log("Starting at", new Date().toISOString());
     try {
@@ -89,11 +95,14 @@ async function start() {
         console.log("Wait done");
         location.reload();
     } catch(error) {
-        await postToLocal({
-            "captcha": new Date(),
-        });
-        await delay(FIVE_MINUTES); 
-        location.reload();
+        if (isCaptchaPage()) {
+            await postToLocal({
+                "captcha": new Date(),
+            });
+        } else {
+            await delay(FIVE_MINUTES); 
+            location.reload();
+        }
     }
 }
 

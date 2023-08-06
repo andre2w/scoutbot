@@ -22,6 +22,8 @@
     "typescript": "^5.1.6"
   },
   "scripts": {
-    "extract": "ts-node ./src/index.ts"
+    "server": "ts-node ./src/server/index.ts",
+    "migrate": "ts-node ./src/server/migrate.ts",
+    "compile": "tsc"
   }
 }

@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { adExists, storeAd } from "./ads";
-import { sendMessage } from "./telegram";
+import { formatListing, sendMessage } from "./telegram";
 import { Listing } from "../types";
 
 async function handleAds(listings: Listing[]): Promise<void> {
@@ -9,8 +9,8 @@ async function handleAds(listings: Listing[]): Promise<void> {
         if (!adExists(listing.id)) {
             try {
                 console.log("Should notify on telegram", listing.id);
-                await sendMessage(listing);
                 storeAd(listing.id);
+                await sendMessage(formatListing(listing));
                 newListings++;
             } catch (error) {
                 console.error(error);
@@ -18,6 +18,11 @@ async function handleAds(listings: Listing[]): Promise<void> {
         }
     }
     console.log(`${new Date().toISOString()} - Received ${listings.length}, New: ${newListings}`);
+}
+
+async function sendCaptchaMessage(captchaTime: any) {
+    console.log("Captcha displayed at", captchaTime);
+    await sendMessage(`Captcha displayed at ${captchaTime}`);
 }
 
 const server = createServer((req, res) => {
@@ -29,10 +34,12 @@ const server = createServer((req, res) => {
 
     req.on("end", () => {
         const reqBody = JSON.parse(body);
+        
         if ("captcha" in reqBody) {
-            console.log("Captcha displayed at", reqBody.captcha);
-            res.writeHead(204);
-            res.end();
+            sendCaptchaMessage(reqBody.captcha).then(() => {
+                res.writeHead(204);
+                res.end();
+            });
             return;
         }
         handleAds(reqBody).then(() => {

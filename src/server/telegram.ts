@@ -13,10 +13,10 @@ Rooms: {ROOMS}
 
 Address: {ADDRESS}
 
-[Apply Now!]({APPLY_LINK})
+Apply Now! {APPLY_LINK}
 `
 
-export function getMessage(listing: Listing): string {
+export function formatListing(listing: Listing): string {
     const msg = MESSAGE_TEMPLATE
         .replace("{PRICE}", listing.price)
         .replace("{SIZE}", listing.size)
@@ -27,7 +27,9 @@ export function getMessage(listing: Listing): string {
     return escape(msg).replace(/\./g, "\\.").replace(/!/g, "\\!").replace(/\-/g,"\\-");
 }
 
-export async function sendMessage(listing: Listing): Promise<void> {
-    await telegraf.telegram.sendMessage(CHAT_ID, getMessage(listing), { parse_mode: "MarkdownV2" });
+export async function sendMessage(message: string): Promise<void> {
+    await telegraf.telegram.sendMessage(CHAT_ID, message, { parse_mode: "MarkdownV2" });
 }
+
+
 
