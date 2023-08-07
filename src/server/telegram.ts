@@ -17,18 +17,21 @@ Apply Now! {APPLY_LINK}
 `
 
 export function formatListing(listing: Listing): string {
-    const msg = MESSAGE_TEMPLATE
+    return MESSAGE_TEMPLATE
         .replace("{PRICE}", listing.price)
         .replace("{SIZE}", listing.size)
         .replace("{ROOMS}", listing.rooms)
         .replace("{ADDRESS}", listing.address)
         .replace("{APPLY_LINK}", `https://www.immobilienscout24.de${listing.link}`);
+}
 
-    return escape(msg).replace(/\./g, "\\.").replace(/!/g, "\\!").replace(/\-/g,"\\-");
+function escapeMessage(message: string): string {
+    return escape(message).replace(/\./g, "\\.").replace(/!/g, "\\!").replace(/\-/g,"\\-");
+
 }
 
 export async function sendMessage(message: string): Promise<void> {
-    await telegraf.telegram.sendMessage(CHAT_ID, message, { parse_mode: "MarkdownV2" });
+    await telegraf.telegram.sendMessage(CHAT_ID, escape(message), { parse_mode: "MarkdownV2" });
 }
 
 

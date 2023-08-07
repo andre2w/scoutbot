@@ -90,7 +90,7 @@ async function start() {
         await waitForSelector(".result-list__listing");
         const listings = getListings();    
         await postToLocal(listings);
-        console.log("Will wait", TWO_MINUTES);
+        console.log("Will wait", FIVE_MINUTES);
         await delay(FIVE_MINUTES);
         console.log("Wait done");
         location.reload();
