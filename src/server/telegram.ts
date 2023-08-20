@@ -31,7 +31,7 @@ function escapeMessage(message: string): string {
 }
 
 export async function sendMessage(message: string): Promise<void> {
-    await telegraf.telegram.sendMessage(CHAT_ID, escape(message), { parse_mode: "MarkdownV2" });
+    await telegraf.telegram.sendMessage(CHAT_ID, escapeMessage(message), { parse_mode: "MarkdownV2" });
 }
 
 
