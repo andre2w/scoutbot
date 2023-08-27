@@ -5,16 +5,17 @@ import escape from "markdown-escape";
 
 const telegraf = new Telegraf(TELEGRAM_API_KEY);
 
-const MESSAGE_TEMPLATE = `New listing found
+const MESSAGE_TEMPLATE = `{TITLE}
 
 Price: {PRICE}
 Size: {SIZE}
 Rooms: {ROOMS}
+{PLUS_LISTING}
 
 Address: {ADDRESS}
 
-Apply Now! {APPLY_LINK}
-`
+{APPLY_LINK}
+`;
 
 export function formatListing(listing: Listing): string {
     return MESSAGE_TEMPLATE
@@ -22,6 +23,8 @@ export function formatListing(listing: Listing): string {
         .replace("{SIZE}", listing.size)
         .replace("{ROOMS}", listing.rooms)
         .replace("{ADDRESS}", listing.address)
+        .replace("{TITLE}", listing.title)
+        .replace("{PLUS_LISTING}", listing.isPlus ? "PLUS LISTING" : "")
         .replace("{APPLY_LINK}", `https://www.immobilienscout24.de${listing.link}`);
 }
 

@@ -12,9 +12,24 @@
 
 import type { Listing } from "../types";
 
+const ONE_MINUTE = 1_000;
 const TWO_MINUTES = 1_000 * 60 * 2;
 const FIVE_MINUTES = 1_000 * 60 * 5;
 const CAPTCHA_SELECTOR = "#captcha-box, .geetest_btn";
+
+function getWaitTime() {
+    const timeNow = new Date();
+
+    if (timeNow.getHours() >= 6 && timeNow.getHours() <= 13) {
+        return ONE_MINUTE;
+    }
+
+    if (timeNow.getHours() <= 20) {
+        return TWO_MINUTES;
+    }
+
+    return FIVE_MINUTES;
+}
 
 function getListings() {
     const listings = document.querySelectorAll(".result-list__listing");
@@ -25,6 +40,8 @@ function getListings() {
         const listingId = listing.getAttribute("data-id")!;
         const [price, size, rooms] = listing.querySelectorAll(".result-list-entry__criteria dl");
         const address = listing.querySelector(".result-list-entry__address");
+        const isPlus = !!listing.querySelector(".plusBooking");
+        const title = listing.querySelector(".result-list-entry__brand-title")?.textContent ?? "New Listing";
         found.push({ 
             id: listingId, 
             link: listingLink?.getAttribute("href")!,
@@ -32,6 +49,8 @@ function getListings() {
             size: size!.textContent!,
             rooms: rooms!.textContent!,
             address: address!.textContent!,
+            isPlus,
+            title,
         });
     }
     return found;
@@ -90,8 +109,9 @@ async function start() {
         await waitForSelector(".result-list__listing");
         const listings = getListings();    
         await postToLocal(listings);
-        console.log("Will wait", FIVE_MINUTES);
-        await delay(FIVE_MINUTES);
+        const waitTime = getWaitTime();
+        console.log("Will wait", waitTime);
+        await delay(waitTime);
         console.log("Wait done");
         location.reload();
     } catch(error) {
