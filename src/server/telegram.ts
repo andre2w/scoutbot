@@ -23,7 +23,7 @@ export function formatListing(listing: Listing): string {
         .replace("{SIZE}", listing.size)
         .replace("{ROOMS}", listing.rooms)
         .replace("{ADDRESS}", listing.address)
-        .replace("{TITLE}", listing.title)
+        .replace("{TITLE}", listing.title.startsWith("NEU") ? listing.title.replace("NEU", "") : listing.title)
         .replace("{PLUS_LISTING}", listing.isPlus ? "PLUS LISTING" : "")
         .replace("{APPLY_LINK}", `https://www.immobilienscout24.de${listing.link}`);
 }
