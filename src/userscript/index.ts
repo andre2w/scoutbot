@@ -12,7 +12,7 @@
 
 import type { Listing } from "../types";
 
-const ONE_MINUTE = 1_000;
+const ONE_MINUTE = 1_000 * 60;
 const TWO_MINUTES = 1_000 * 60 * 2;
 const FIVE_MINUTES = 1_000 * 60 * 5;
 const CAPTCHA_SELECTOR = "#captcha-box, .geetest_btn";
