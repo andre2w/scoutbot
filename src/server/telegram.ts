@@ -5,6 +5,8 @@ import escape from "markdown-escape";
 
 const telegraf = new Telegraf(TELEGRAM_API_KEY);
 
+const CHARACTERS_TO_ESCAPE = [".", "!", "-", "+", "=", "~"];
+
 const MESSAGE_TEMPLATE = `{TITLE}
 
 Price: {PRICE}
@@ -29,13 +31,7 @@ export function formatListing(listing: Listing): string {
 }
 
 function escapeMessage(message: string): string {
-    return escape(message)
-        .replace(/\./g, "\\.")
-        .replace(/!/g, "\\!")
-        .replace(/\-/g,"\\-")
-        .replace(/\+/g, "\\+")
-        .replace(/=/g, "\\=");
-
+    return CHARACTERS_TO_ESCAPE.reduce((msg, character) => msg.replaceAll(character, `\\${character}`), escape(message)) 
 }
 
 export async function sendMessage(message: string): Promise<void> {
