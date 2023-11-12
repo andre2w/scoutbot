@@ -29,7 +29,12 @@ export function formatListing(listing: Listing): string {
 }
 
 function escapeMessage(message: string): string {
-    return escape(message).replace(/\./g, "\\.").replace(/!/g, "\\!").replace(/\-/g,"\\-");
+    return escape(message)
+        .replace(/\./g, "\\.")
+        .replace(/!/g, "\\!")
+        .replace(/\-/g,"\\-")
+        .replace(/\+/g, "\\+")
+        .replace(/=/g, "\\=");
 
 }
 
