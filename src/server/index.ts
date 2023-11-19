@@ -3,7 +3,7 @@ import { adExists, storeAd } from "./ads";
 import { formatListing, sendMessage } from "./telegram";
 import { Listing } from "../types";
 
-async function handleAds(listings: Listing[]): Promise<void> {
+export async function handleAds(listings: Listing[]): Promise<void> {
     let newListings = 0;
     for (const listing of listings) {
         if (!adExists(listing.id)) {
@@ -20,7 +20,7 @@ async function handleAds(listings: Listing[]): Promise<void> {
     console.log(`${new Date().toISOString()} - Received ${listings.length}, New: ${newListings}`);
 }
 
-async function sendCaptchaMessage(captchaTime: any) {
+export async function sendCaptchaMessage(captchaTime: any) {
     console.log("Captcha displayed at", captchaTime);
     await sendMessage(`Captcha displayed at ${captchaTime}`);
 }
@@ -49,6 +49,6 @@ const server = createServer((req, res) => {
     });
 });
 
-server.listen(4433, () => {
-    console.log("Server started at", new Date().toISOString());
-});
+// server.listen(4433, () => {
+//     console.log("Server started at", new Date().toISOString());
+// });
