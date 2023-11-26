@@ -3,13 +3,13 @@ import { adExists, storeAd } from "./ads";
 import { formatListing, sendMessage } from "./telegram";
 import { Listing } from "../types";
 
-export async function handleAds(listings: Listing[]): Promise<void> {
+export async function handleAds(listings: Listing[], source: string): Promise<void> {
     let newListings = 0;
     for (const listing of listings) {
-        if (!adExists(listing.id)) {
+        if (!adExists({ id: listing.id, source })) {
             try {
                 console.log("Should notify on telegram", listing.id);
-                storeAd(listing.id);
+                storeAd({ id: listing.id, source });
                 await sendMessage(formatListing(listing));
                 newListings++;
             } catch (error) {
@@ -17,7 +17,7 @@ export async function handleAds(listings: Listing[]): Promise<void> {
             }
         }
     }
-    console.log(`${new Date().toISOString()} - Received ${listings.length}, New: ${newListings}`);
+    console.log(`[${source}] ${new Date().toISOString()} - Received ${listings.length}, New: ${newListings}`);
 }
 
 export async function sendCaptchaMessage(captchaTime: any) {
@@ -42,7 +42,7 @@ const server = createServer((req, res) => {
             });
             return;
         }
-        handleAds(reqBody).then(() => {
+        handleAds(reqBody, "immoscout").then(() => {
             res.writeHead(204);
             res.end();
         });

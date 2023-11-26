@@ -1,20 +1,23 @@
-import { sqliteTable, integer, text  } from "drizzle-orm/sqlite-core";
-import { drizzle, BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { sqliteTable, text  } from "drizzle-orm/sqlite-core";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
-import { eq } from "drizzle-orm";
+import { and, eq, InferModel } from "drizzle-orm";
 
-export const ad = sqliteTable("ad", {
+export const adTable = sqliteTable("ad", {
     id: text("id").primaryKey(),
-})
+    source: text("source").notNull(),
+});
+
+export type Ad = InferModel<typeof adTable>;
 
 const immoscoutDb = new Database("Immoscout");
 export const db = drizzle(immoscoutDb);
 
-export function adExists(id: string): boolean {
-    const res = db.select().from(ad).where(eq(ad.id, id));
+export function adExists(ad: Ad): boolean {
+    const res = db.select().from(adTable).where(and(eq(adTable.id, ad.id), eq(adTable.source, ad.source)));
     return res.all().length !== 0;
 }
 
-export function storeAd(id: string) {
-    db.insert(ad).values({ id }).run();
+export function storeAd(ad: Ad) {
+    db.insert(adTable).values(ad).run();
 }
