@@ -1,6 +1,5 @@
 import { Page } from "playwright";
 import { Listing } from "../../types";
-import { handleAds, sendCaptchaMessage } from "..";
 import { setTimeout } from "node:timers/promises";
 import { ONE_MINUTE, getWaitTime } from "../utils";
 import { BaseExtractor } from "./BaseExtractor";

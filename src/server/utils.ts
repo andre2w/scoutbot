@@ -3,6 +3,7 @@ export const TWO_MINUTES = 1_000 * 60 * 2;
 export const FIVE_MINUTES = 1_000 * 60 * 5;
 
 export function getWaitTime() {
+    return ONE_MINUTE;
     const timeNow = new Date();
 
     if (timeNow.getHours() >= 6 && timeNow.getHours() <= 13) {

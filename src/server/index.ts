@@ -1,54 +1,25 @@
-import { createServer } from "http";
-import { adExists, storeAd } from "./ads";
-import { formatListing, sendMessage } from "./telegram";
-import { Listing } from "../types";
+import { firefox } from "playwright";
+import { ImmoScoutExtractor } from "./extractors/immoscout";
+import { ImmoweltExtractor } from "./extractors/immowelt";
 
-export async function handleAds(listings: Listing[], source: string): Promise<void> {
-    let newListings = 0;
-    for (const listing of listings) {
-        if (!adExists({ id: listing.id, source })) {
-            try {
-                console.log("Should notify on telegram", listing.id);
-                storeAd({ id: listing.id, source });
-                await sendMessage(formatListing(listing));
-                newListings++;
-            } catch (error) {
-                console.error(error);
-            }
-        }
+async function run(url: string) {    
+    const browser = await firefox.launch({
+        headless: false,
+    });
+
+    if (url.includes("immobilienscout24.de")) {
+        await browser.newPage().then(page => new ImmoScoutExtractor(page, url)).then(e => e.start());
+    } else if (url.includes("immowelt.de")) {
+        await browser.newPage().then(page => new ImmoweltExtractor(page, url)).then(e => e.start());
+    } else {
+        throw new Error(`Invalid url: ${url}`);
     }
-    console.log(`[${source}] ${new Date().toISOString()} - Received ${listings.length}, New: ${newListings}`);
 }
 
-export async function sendCaptchaMessage(captchaTime: any) {
-    console.log("Captcha displayed at", captchaTime);
-    await sendMessage(`Captcha displayed at ${captchaTime}`);
+const url = process.argv[2];
+
+if (url == null) {
+    console.log("Invalid url");
+    process.exit(1);
 }
-
-const server = createServer((req, res) => {
-    let body = "";
-
-    req.on("data", chunk => {
-        body += chunk;
-    });
-
-    req.on("end", () => {
-        const reqBody = JSON.parse(body);
-        
-        if ("captcha" in reqBody) {
-            sendCaptchaMessage(reqBody.captcha).then(() => {
-                res.writeHead(204);
-                res.end();
-            });
-            return;
-        }
-        handleAds(reqBody, "immoscout").then(() => {
-            res.writeHead(204);
-            res.end();
-        });
-    });
-});
-
-// server.listen(4433, () => {
-//     console.log("Server started at", new Date().toISOString());
-// });
+run(url);

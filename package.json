@@ -22,8 +22,7 @@
     "typescript": "^5.1.6"
   },
   "scripts": {
-    "server": "ts-node ./src/server/index.ts",
     "migrate": "ts-node ./src/server/migrate.ts",
-    "compile": "tsc"
+    "start": "npm run migrate && ts-node ./src/server/index.ts"
   }
 }
