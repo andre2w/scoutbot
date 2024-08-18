@@ -17,7 +17,7 @@ async function run(url: string) {
 }
 
 const url = process.argv[2];
-
+console.log(url);
 if (url == null) {
     console.log("Invalid url");
     process.exit(1);
